@@ -24,7 +24,6 @@ public class ClientManager implements Runnable {
             broadcastMessage("Server: " + name + " подключился к чату.");
         } catch (IOException e) {
             closeEveryThing(socket, bufferedReader, bufferedWriter);
-
         }
     }
 
@@ -32,15 +31,25 @@ public class ClientManager implements Runnable {
         return name;
     }
 
+    /**
+     * Удаление клиента из коллекции. Заврешение работы socket, bufferedReader, bufferedWriter
+     * @param socket соединение с клиентским сокетом
+     * @param bufferedReader буфер на чтение данных
+     * @param bufferedWriter буфер для записи данных
+     */
     private void closeEveryThing(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
+        // Удаление клиента из коллекции
         removeClient();
         try {
+            // Завершаем работу буфера на чтение данных
             if (bufferedReader != null) {
                 bufferedReader.close();
             }
+            // Завершаем работу буфера для записи данных
             if (bufferedWriter != null) {
                 bufferedWriter.close();
             }
+            // Закрытие соединения с клиентским сокетом
             if (socket != null) {
                 socket.close();
             }
@@ -49,12 +58,19 @@ public class ClientManager implements Runnable {
         }
     }
 
+    /**
+     * Удаление клиента из коллекции
+     */
     private void removeClient() {
         clients.remove(this);
         System.out.println(name + " покинул чат.");
         broadcastMessage("Server: " + name + " покинул чат.");
     }
 
+    /**
+     * Отправка сообщения одному слушателю
+     * @param message сообщение
+     */
     private void personalMessage(String message) {
         String[] arr = message.split(" ", 3);
         String name = arr[1].substring(1);
@@ -78,6 +94,10 @@ public class ClientManager implements Runnable {
         }
     }
 
+    /**
+     * Отправка сообщения всем слушателям
+     * @param message сообщение
+     */
     private void broadcastMessage(String message) {
         for (ClientManager client : clients) {
             try {
@@ -91,7 +111,6 @@ public class ClientManager implements Runnable {
             }
         }
     }
-
 
     @Override
     public void run() {
@@ -109,6 +128,4 @@ public class ClientManager implements Runnable {
             }
         }
     }
-
-
 }
